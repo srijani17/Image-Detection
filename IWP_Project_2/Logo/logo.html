@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LOGO Detection</title>
+    <link rel="stylesheet" href="logo.css" />
+  </head>
+
+  <body>
+    <div id="logoPage" class="page hidden">
+      <h1>Logo Detection</h1>
+      <div class="upload-section">
+        <input type="file" id="logoImageInput" accept="image/*" />
+      </div>
+      <button id="detectLogoButton" onclick = "detectLogo()"><b>Detect Logo</b></button>
+      <div id="logoResult"></div>
+      <div id="logoImageContainer"></div>
+      <!-- <button id="goToHome" class="go-home"><b>Go to Home</b></button> -->
+      <a href = "../page.html"><button id="goToHome" class="go-home"><b>Go to Home</b></button></a>
+    </div>
+
+    <div class="bgimage bgimage1">
+      <img src="../Images/Logos/image1.png" alt="" />
+    </div>
+    <div class="bgimage bgimage2">
+      <img src="../Images/Logos/image2.png" alt="" />
+    </div>
+    <div class="bgimage bgimage3">
+      <img src="../Images/Logos/image3.png" alt="" />
+    </div>
+    <div class="bgimage bgimage4">
+      <img src="../Images/Logos/image4.png" alt="" />
+    </div>
+    <script>
+      function detectLogo() {
+        var fileInput = document.getElementById("logoImageInput");
+        if (!fileInput.files) {
+          alert("Please Select a File");
+          return;
+        }
+        var file = fileInput.files[0];
+        console.log("1");
+        if (file) {
+          let xhr = new XMLHttpRequest();
+          xhr.open(
+            "POST",
+            "https://detect.roboflow.com/logo-detector-cgxef/2?api_key=HsD9uEvPFhxWF42KdLHY"
+          );
+          
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              let response = JSON.parse(xhr.responseText);
+              predictions = response.predictions;
+              document.getElementById("logoResult").innerHTML = "";
+              console.log("result " + predictions);
+              for (let i = 0; i < predictions.length; i++) {
+                document.getElementById("logoResult").innerHTML +=
+                  "Company:" +
+                  predictions[i].class +
+                  "  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Confidence : " +
+                  predictions[i].confidence +
+                  "<br>";
+              }
+            } else {
+              alert("Error Code" + xhr.status);
+            }
+          };
+          const formData = new FormData();
+          formData.append("file", file);
+          xhr.send(formData);
+        } else {
+          alert("Please Select an image file");
+        }
+      }
+      //document.getElementById('detectFoodButton').addEventListener('click', detectFood);
+      document
+        .getElementById("goToHome")
+        .addEventListener("click", function () {
+          window.location.href = "../page.html";
+        });
+    </script>
+  </body>
+</html>
+

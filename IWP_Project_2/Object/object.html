@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBJECT Detection</title>
+    <link rel="stylesheet" href="objstyle.css">
+</head>
+
+<body>
+    <div id="objectPage" class="page hidden">
+        <h1>Object Detection</h1>
+        <div class="upload-section">
+            <input type="file" id="objectImageInput" accept="image/*">
+        </div>
+        <button id="detectObjectButton" onclick = "detectObject()"><b>Detect Object</b></button>
+        <div id="objectResult"></div>
+        <div id="objectImageContainer"></div>
+        <a href = "../page.html"><button id="goToHome" class="go-home"><b>Go to Home</b></button></a>
+    </div>
+
+    <div class="bgimage bgimage1">
+        <img src="../Images/Objects/image1.jpeg" alt="">
+    </div>
+    <div class="bgimage bgimage2">
+        <img src="../Images/Objects/image2.png" alt="">
+    </div>
+    <div class="bgimage bgimage3">
+        <img src="../Images/Objects/image3.jpg" alt="">
+    </div>
+    <div class="bgimage bgimage4">
+        <img src="../Images/Objects/image4.jpg" alt="">
+    </div>
+    <script>
+        function detectObject() {
+            const fileInput = document.getElementById('objectImageInput');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const base64Image = event.target.result.split(',')[1]; 
+                    sendRequest(base64Image);
+                };
+            }
+        }
+
+        function sendRequest(base64Image) {
+            const PAT = 'e54d52c83aed4ed0b5e767304cf74f0c';
+            const USER_ID = 'clarifai';
+            const APP_ID = 'main';
+            const MODEL_ID = 'general-image-detection';
+            const MODEL_VERSION_ID = '1580bb1932594c93b7e2e04456af7c6f';
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Key ' + PAT
+                },
+                body: JSON.stringify({
+                    "user_app_id": {
+                        "user_id": USER_ID,
+                        "app_id": APP_ID
+                    },
+                    "inputs": [
+                        {
+                            "data": {
+                                "image": {
+                                    "base64": base64Image
+                                }
+                            }
+                        }
+                    ]
+                })
+            };
+
+            fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    const regions = result.outputs[0].data.regions;
+                    const foodResult = document.getElementById('objectResult');
+                    foodResult.innerHTML = '';
+
+                    regions.forEach(region => {
+                        const concepts = region.data.concepts;
+                        concepts.forEach(concept => {
+                            const name = concept.name;
+                            const value = concept.value.toFixed(4);
+                            foodResult.innerHTML += `${name}: ${value}<br>`;
+                        });
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+
+</html>
