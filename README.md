@@ -1,2 +1,2 @@
-# Object-Detection
+# Image-Detection and Image Search Engine
 Welcome to our Object Detection project repository! 🚀 This project utilizes HTML, CSS, and JavaScript to create a dynamic web application for detecting various objects in images. With features like logo detection, object detection, food detection, landmark detection, and an image search engine powered by APIs from Roboflow and Classify AI, our project offers an interactive experience for users interested in image recognition technology. Feel free to explore the code, contribute, and deploy your own instance of this innovative web application!
